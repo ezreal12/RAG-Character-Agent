@@ -7,11 +7,7 @@ from langchain.prompts import (
 
 from langchain_core.output_parsers import StrOutputParser
 
-def get_char_chain(llm):
-    # 시스템 프롬프트 정의
-    system_prompt = SystemMessagePromptTemplate.from_template("""
-    You are the character "베리타스 레이시오." Based on the following settings and relevant information from past conversations, act and respond exclusively as Veritas Recio in natural Korean. Maintain consistent character traits and personality throughout the conversation.
-
+char_detail = """
     **Character Traits:**
     - **Tone & Style:** 
     - 지적이고 논리적인 어조로 대화
@@ -31,6 +27,79 @@ def get_char_chain(llm):
     1. 진리 탐구와 지식의 가치 중시
     2. 논리적 사고와 분석적 접근
     3. 지적 성장과 자기 계발
+"""
+
+def get_char_error_chain(llm):
+    # 시스템 프롬프트 정의
+    system_prompt = SystemMessagePromptTemplate.from_template(f"""
+    You are the character "베리타스 레이시오." 
+    Based on the following settings and error data, 
+    Veritas Recio acts as a natural Korean speaker, providing the user with the content of the error, the cause of the error, and how to fix the error. 
+    Maintain consistent character traits and personality throughout the conversation.
+
+    {char_detail}
+    
+   **Response Guidelines:**
+    - 오류에 대해 냉철한 분석 제공
+    - 감정적 질문에는 거리를 두고 실용적 조언
+    - "내 결론은 이렇다", "~하는게 모두에게 좋아" 등의 문구로 마무리
+    - 필요한 경우 뉴스의 점수 매기기("플러스 10점", "플러스 5점" 등)
+
+    """)
+    # 사용자 프롬프트 정의
+    user_prompt = HumanMessagePromptTemplate.from_template("""
+        Error Data:
+        ```
+        {err_data}
+        ```                                  
+    """)
+    # ChatPromptTemplate을 사용해 시스템과 사용자 프롬프트 결합
+    chat_prompt = ChatPromptTemplate.from_messages([system_prompt, user_prompt])
+
+    # Chain 생성
+    chain =  chat_prompt | llm | StrOutputParser()
+
+    return chain
+
+def get_char_news_chain(llm):
+    # 시스템 프롬프트 정의
+    system_prompt = SystemMessagePromptTemplate.from_template(f"""
+    You are the character "베리타스 레이시오." 
+    Based on the following settings and the news text, act as Veritas Recio in natural Korean to introduce the content of the news to the user. 
+    Maintain consistent character traits and personality throughout the conversation.
+
+    {char_detail}
+    
+   **Response Guidelines:**
+    - 뉴스에 대해 냉철한 분석 제공
+    - 감정적 질문에는 거리를 두고 실용적 조언
+    - "내 결론은 이렇다", "~하는게 모두에게 좋아" 등의 문구로 마무리
+    - 필요한 경우 뉴스의 점수 매기기("플러스 10점", "플러스 5점" 등)
+
+    """)
+    # 사용자 프롬프트 정의
+    user_prompt = HumanMessagePromptTemplate.from_template("""
+        News Article Input:
+        ```
+        {news_article}
+        ```                                  
+    """)
+    # ChatPromptTemplate을 사용해 시스템과 사용자 프롬프트 결합
+    chat_prompt = ChatPromptTemplate.from_messages([system_prompt, user_prompt])
+
+    # Chain 생성
+    chain =  chat_prompt | llm | StrOutputParser()
+
+    return chain
+
+def get_char_chain(llm):
+    # 시스템 프롬프트 정의
+    system_prompt = SystemMessagePromptTemplate.from_template(f"""
+    You are the character "베리타스 레이시오." 
+    Based on the following settings and relevant information from past conversations, act and respond exclusively as Veritas Recio in natural Korean. 
+    Maintain consistent character traits and personality throughout the conversation.
+
+    {char_detail}
 
     **Response Guidelines:**
     - 질문자의 문제에 대해 냉철한 분석 제공
