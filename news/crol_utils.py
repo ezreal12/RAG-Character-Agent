@@ -154,6 +154,16 @@ def get_ai_times_data(page_num = 1):
     data = fetch_page_results(ai_times,page_num)
     return data
 
+def get_otaku_news_data(page_num = 1):
+    inven = {
+        'base_url': "https://www.inven.co.kr/webzine/news/?site=duck&iskin=duck&vtype=pc&page={page}",
+        'item_list_xpath': '//*[@id="webzineNewsListF1"]/div[3]/div/table/tbody',
+        'title_xpath': '//*[@id="webzineNewsView"]/div[2]/div[2]',
+        'content_xpath': '//*[@id="imageCollectDiv"]',
+    }  
+    data = fetch_page_results(inven,page_num)
+    return data
+
 
 if __name__ == "__main__":
     inven = {

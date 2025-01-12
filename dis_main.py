@@ -116,8 +116,11 @@ async def start_timer_function():
         if len(channel_list) == 0:
             log("채널 리스트 없음.")
             return
-            
-        crol_data = crol_utils.get_ai_times_data()
+           
+        otaku_news_data = crol_utils.get_otaku_news_data()
+        ai_news_data = crol_utils.get_ai_times_data()
+        crol_data = otaku_news_data + ai_news_data
+        
         log(f"크롤링 데이터 수신 완료: {len(crol_data)}개의 데이터")
         for channel in channel_list:
             try:
