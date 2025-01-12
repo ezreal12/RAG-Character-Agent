@@ -10,7 +10,7 @@ from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain_community.embeddings import OllamaEmbeddings
 from news import news_db, crol_utils, news_summury_module
-import char_ratio
+import char_ratio, char_shiro
 import log_util
 
 # 환경 변수 로드
@@ -18,6 +18,7 @@ load_dotenv(override=True)
 TOKEN = os.getenv('DISCORD_TOKEN')
 BASE_URL = os.getenv('BASE_URL')
 NEWS_RUN_TIME = os.getenv('NEWS_RUN_TIME',"18:00")
+CHAR_NAME = os.getenv('CHAR_NAME',"레이시오")
 DB_DIR = "./db"
 
 # 디렉토리 생성
@@ -39,10 +40,16 @@ high_level_model = ChatOllama(
     temperature=0, num_predict=32768
 )
 low_level_model = ChatOllama(base_url=BASE_URL, model="gemma2:2b", temperature=0)
-chain = char_ratio.get_char_chain(char_level_model)
-news_char_agent = char_ratio.get_char_news_chain(high_level_model)
-error_chat_agent = char_ratio.get_char_error_chain(high_level_model)
 summury_agent = news_summury_module.get_summury_chain(low_level_model)
+if(CHAR_NAME == "레이시오"):
+    chain = char_ratio.get_char_chain(char_level_model)
+    news_char_agent = char_ratio.get_char_news_chain(high_level_model)
+    error_chat_agent = char_ratio.get_char_error_chain(high_level_model)
+else:
+    chain = char_shiro.get_char_chain(char_level_model)
+    news_char_agent = char_shiro.get_char_news_chain(high_level_model)
+    error_chat_agent = char_shiro.get_char_error_chain(high_level_model)
+
 def log(msg):
     """로그를 파일에 저장."""
     log_util.log(msg, save_to_file=True)
@@ -117,10 +124,11 @@ async def start_timer_function():
             log("채널 리스트 없음.")
             return
            
-        otaku_news_data = crol_utils.get_otaku_news_data()
-        ai_news_data = crol_utils.get_ai_times_data()
-        crol_data = otaku_news_data + ai_news_data
-        
+        crol_data = crol_utils.get_otaku_news_data()
+        if(CHAR_NAME == "레이시오"):
+            ai_news_data = crol_utils.get_ai_times_data()
+            crol_data = crol_data + ai_news_data
+
         log(f"크롤링 데이터 수신 완료: {len(crol_data)}개의 데이터")
         for channel in channel_list:
             try:
@@ -215,7 +223,7 @@ async def on_message(message):
         "content": message.content
     })
 
-    if message.content.startswith("#레이시오"):
+    if message.content.startswith("#"+ CHAR_NAME):
         await message.channel.send("(답변 작성중)")
         relevant_docs = retriever.get_relevant_documents(message.content)
         context = "\n".join([doc.page_content for doc in relevant_docs])

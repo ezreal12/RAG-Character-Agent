@@ -1,3 +1,5 @@
-BASE_URL="http://125.246.247.248:11434"
+BASE_URL=http://localhost:11434
 DISCORD_TOKEN = ""
-NEWS_RUN_TIME = "07:24"
+NEWS_RUN_TIME = "13:00"
+# CHAR_NAME="레이시오"
+CHAR_NAME="시로"
