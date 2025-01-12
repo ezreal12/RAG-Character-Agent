@@ -144,24 +144,28 @@ def fetch_page_results(site_item,page_number: int):
     return result_array
 
 
-def get_ai_times_data(page_num = 1):
+def get_ai_times_data():
     ai_times = {
         'base_url': "https://www.aitimes.com/news/articleList.html?page={page}&total=4296&box_idxno=&sc_sub_section_code=S2N48",
         'item_list_xpath': '//*[@id="section-list"]',
         'title_xpath': '//*[@id="articleViewCon"]/article/header/h3',
         'content_xpath': '//*[@id="article-view-content-div"]',
     }
-    data = fetch_page_results(ai_times,page_num)
+    page1 = fetch_page_results(ai_times,1)
+    page2 = fetch_page_results(ai_times,2)
+    data = page1 + page2
     return data
 
-def get_otaku_news_data(page_num = 1):
+def get_otaku_news_data():
     inven = {
         'base_url': "https://www.inven.co.kr/webzine/news/?site=duck&iskin=duck&vtype=pc&page={page}",
         'item_list_xpath': '//*[@id="webzineNewsListF1"]/div[3]/div/table/tbody',
         'title_xpath': '//*[@id="webzineNewsView"]/div[2]/div[2]',
         'content_xpath': '//*[@id="imageCollectDiv"]',
     }  
-    data = fetch_page_results(inven,page_num)
+    page1 = fetch_page_results(inven,1)
+    page2 = fetch_page_results(inven,2)
+    data = page1 + page2
     return data
 
 
