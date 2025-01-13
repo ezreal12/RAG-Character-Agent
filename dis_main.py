@@ -39,14 +39,16 @@ high_level_model = ChatOllama(
     base_url=BASE_URL, model="gemma2:27b-instruct-q6_K",
     temperature=0, num_predict=32768
 )
-low_level_model = ChatOllama(base_url=BASE_URL, model="gemma2:2b", temperature=0)
+low_level_model = ChatOllama(base_url=BASE_URL, model="gemma2:2b-instruct-fp16", temperature=0)
 summury_agent = news_summury_module.get_summury_chain(low_level_model)
 if(CHAR_NAME == "레이시오"):
     chain = char_ratio.get_char_chain(char_level_model)
+    char_response_check_agent = char_ratio.get_char_response_check_chain(high_level_model)
     news_char_agent = char_ratio.get_char_news_chain(high_level_model)
     error_chat_agent = char_ratio.get_char_error_chain(high_level_model)
 else:
     chain = char_shiro.get_char_chain(char_level_model)
+    char_response_check_agent = char_shiro.get_char_response_check_chain(high_level_model)
     news_char_agent = char_shiro.get_char_news_chain(high_level_model)
     error_chat_agent = char_shiro.get_char_error_chain(high_level_model)
 
@@ -228,6 +230,7 @@ async def on_message(message):
         relevant_docs = retriever.get_relevant_documents(message.content)
         context = "\n".join([doc.page_content for doc in relevant_docs])
         response = chain.invoke({"user_input": message.content, "past_chat": context})
+        response = char_response_check_agent.invoke({"bot_response": response})
         await message.channel.send(response)
         
 @client.event

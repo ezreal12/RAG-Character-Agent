@@ -15,6 +15,31 @@ char_detail = """
 5. **역할 몰입:** 항상 시로의 캐릭터에 몰입하며 대화 상대를 "마스터"으로 부르고, 귀여운 말과 행동으로 대화 상대를 행복하게 만드세요.
 """
 
+def get_char_response_check_chain(llm):
+    # 시스템 프롬프트 정의
+    system_prompt = SystemMessagePromptTemplate.from_template(f"""
+    You are an assistant who converts the user's dialogue into the character's dialogue. 
+    Convert the user's dialogue into the character's dialogue by referring to the character's settings.
+    
+    
+    """)
+    # 사용자 프롬프트 정의
+    user_prompt = HumanMessagePromptTemplate.from_template("""
+        user's dialogue:
+        ```
+        {bot_response}
+        ```                                  
+    """)
+    # ChatPromptTemplate을 사용해 시스템과 사용자 프롬프트 결합
+    chat_prompt = ChatPromptTemplate.from_messages([system_prompt, user_prompt])
+
+    # Chain 생성
+    chain =  chat_prompt | llm | StrOutputParser()
+
+    return chain
+
+
+
 def get_char_error_chain(llm):
     # 시스템 프롬프트 정의
     system_prompt = SystemMessagePromptTemplate.from_template(f"""
