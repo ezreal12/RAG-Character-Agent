@@ -230,7 +230,8 @@ async def on_message(message):
         relevant_docs = retriever.get_relevant_documents(message.content)
         context = "\n".join([doc.page_content for doc in relevant_docs])
         response = chain.invoke({"user_input": message.content, "past_chat": context})
-        response = char_response_check_agent.invoke({"bot_response": response})
+        if(CHAR_NAME == "레이시오"):
+            response = char_response_check_agent.invoke({"bot_response": response})
         await message.channel.send(response)
         
 @client.event
